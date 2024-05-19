@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import React, {useState} from 'react'
-import { Loader2 } from 'lucide-react';
+
 
 
 import { z } from "zod"
@@ -24,7 +24,9 @@ import { authformSchema } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import SignIn from '@/app/(auth)/sign-in/page';
 import SignUp from '@/app/(auth)/sign-up/page';
+import { Loader2 } from 'lucide-react';
 import { getLoggedInUser, signIn, signUp } from '@/lib/actions/user.actions';
+import PlaidLink from './PlaidLink';
 
 
 
@@ -52,9 +54,25 @@ const AuthForm = ({type}: {type: string}) => {
       setIsLoading(true);
       try{
        //sign up with appwrite  & create plain link token
+       
 
        if(type === 'sign-up'){
-        const newUser =  await signUp(data);
+
+        const userData= {
+          firstName: data.firstName!,
+          lastName: data.lastName!,
+          address1: data.address1!,
+          city: data.city!,
+          state: data.state!,
+          postalCode: data.postalCode!,
+          dateOfBirth: data.dateOfBirth!,
+          ssn:data.ssn!,
+          email:data.email,
+          password:data.password
+
+         }
+      
+         const newUser = await signUp(userData);
 
         setUser(newUser);
        }
@@ -91,11 +109,11 @@ const AuthForm = ({type}: {type: string}) => {
           </Link>
           <div className='flex flex-col gap-1 md:gap-3'>
             <h1 className='text-24 lg:text-36 font-semibold text-gray-900'>
-              {user
+              {user 
                 ? 'Link Account'
                 : type === 'sign-in'
                   ? 'Sign In'
-                  : 'Sign Up'           
+                  : 'Sign Up'
               }
               <p className='text-16 font-normal text-gray-600'>
                 {user
@@ -108,9 +126,9 @@ const AuthForm = ({type}: {type: string}) => {
       </header>
       {user ? (
         <div className='flex flex-col gap-4'>
-          {/* PlaidLink */}
+         <PlaidLink user={user} variant="primary"/>
         </div>
-      ):(
+       ):(
       <>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -173,13 +191,13 @@ const AuthForm = ({type}: {type: string}) => {
             placeholder="Enter your password"
           /> 
           <div className='flex flex-col gap-4'>          
-            <Button type="submit"disabled={isLoading} className='form-btn'>
+            <Button type="submit" disabled={isLoading} className='form-btn'>
               {isLoading ? (
                 <>
                 <Loader2 size={20} className="animate-spin"/> &nbsp; Loading...
                 </>
               ): type === 'sign-in' 
-                ? 'sign-in' : 'sign-Up'}
+                ? 'Sign-in' : 'Sign-Up'}
             </Button>
           </div>
         </form>
@@ -191,17 +209,13 @@ const AuthForm = ({type}: {type: string}) => {
               :'Already have an account?'
             }
             </p>
-            <Link href={type === 'sign-in' ? '/sign-up'
-              : '/sign-in'
-            } className='form-link'>
-              {type === 'sign-in' ? 'Sign-up'
-              : 'Sign-in'
-            }
+            <Link href={type === 'sign-in' ? '/sign-up' : '/sign-in'} className="form-link">
+              {type === 'sign-in' ? 'Sign up' : 'Sign in'}
             </Link>
         </footer>
       </>
 
-      )}
+      )} 
     </section>
   )
 };
